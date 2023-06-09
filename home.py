@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import random
-import matplotlib.pyplot as plt
 
 add_selectbox = st.sidebar.selectbox(#사이드바에 목차,'메뉴고르기'페이지와'지역 배달 차트'페이지로 분류
     "목차",
