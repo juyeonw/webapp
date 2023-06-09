@@ -2,15 +2,16 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import random
+import matplotlib.pyplot as plt
 
-add_selectbox = st.sidebar.selectbox(
+add_selectbox = st.sidebar.selectbox(#사이드바에 목차,'메뉴고르기'페이지와'지역 배달 차트'페이지로 분류
     "목차",
-    ("메뉴 고르기", "차트")
+    ("메뉴 고르기", "지역 배달 차트","업종별 배달 차트")
 )
-with st.sidebar:
+with st.sidebar:#사이드바에 학번 이름 기입
     st.caption('made by.2103766우주연')
 
-if(add_selectbox == "메뉴 고르기"):
+if(add_selectbox == "메뉴 고르기"):#사이드바에서 메뉴고르기 선택 시
     st.write('# :cherry_blossom: Welcome to My Web page!')
     st.video('https://youtu.be/Pyr4HUpT1tg') #유튜브 실행
     st.caption('노래를 들으며 메뉴를 고민해보아요:ok_hand:')
@@ -37,7 +38,7 @@ if(add_selectbox == "메뉴 고르기"):
             randomchoice=random.randrange(len(options)) #list의 갯수만큼 랜덤한 숫자 한가지를 선택
             randomchoicemenu=options[randomchoice] #그 숫자에 해당하는 options특징을 저장
             
-            st.write('**랜덤으로 선택된 메뉴는:blue[*',randomchoicemenu,'*]입니다!**') #랜덤으로 특징을 추천하듯 출력됨
+            st.write('**랜덤으로 선택된 특징은:blue[*',randomchoicemenu,'*]입니다!**') #랜덤으로 특징을 추천하듯 출력됨
             if randomchoicemenu=='한식': #만약 한식이 나온다면 
                 foods=menudata[menudata['country'] == '한식'] #foods에 한식 데이터를 저장
             elif randomchoicemenu=='중식': #만약 중식이 나온다면 
@@ -74,21 +75,113 @@ if(add_selectbox == "메뉴 고르기"):
             st.write('오늘의 ',genre,'으로 이건 어때요?') #랜덤으로 선택된 메뉴의 한가지를 추천하는 문구 출력
             st.write(Recommendonename) #랜덤으로 선택된 메뉴의 한가지를 추천
         
-if(add_selectbox == "차트"):
+if(add_selectbox == "지역 배달 차트"):#사이드바에서 지역 배달 차트 선택 시
+    st.write("# :bar_chart: Let's see the stats#1")
+    st.subheader('지역에 따른 년도별 배달 변화 추이')#지역에 따른 배달 이용률 변화 추이
+    data = pd.read_csv('delivery.csv',encoding='cp949') #delivery차트 파일을 읽어옴(출처:https://kosis.kr/statHtml/statHtml.do?orgId=114&tblId=DT_114054_016)
+    year = st.slider(':spiral_calendar_pad:년도를 선택하세요.', 2018, 2022,2021)#슬라이더로 년도 선택 
+    st.write(year,"년으로 보여드릴게요!")#선택한 년도 알려줌
     
-    data = pd.read_csv('delivery.csv',encoding='cp949')
-    year = st.slider('년도를 선택하세요.', 2018, 2022, step = 1)
-    st.write("year:", year)
-    st.write(data)
+    regiondata=data[data['특성별(1)']=='지역별'] #지역별로 된 데이터만 가져옴
+    if year==2018:#만약 슬라이더가 2018이면
+        usedata=regiondata[['특성별(2)','2018']] #지역이름과 2018년 데이터만 가져옴
+        usedata['2018'] = pd.to_numeric(usedata['2018'], errors='coerce') #pd.to_numeric()= '2018' 열의 값을 숫자 유형으로 변환
+        usedata.sort_values('2018', inplace=True) #오름차순으로 정렬
+    elif year==2019:#만약 슬라이더가 2019이면
+        usedata=regiondata[['특성별(2)','2019']]#지역이름과 2019년 데이터만 가져옴
+        usedata['2019'] = pd.to_numeric(usedata['2019'], errors='coerce') #pd.to_numeric()= '2019' 열의 값을 숫자 유형으로 변환
+        usedata.sort_values('2019', inplace=True) #오름차순으로 정렬
+    elif year==2020:#만약 슬라이더가 2020이면
+        usedata=regiondata[['특성별(2)','2020']]#지역이름과 2020년 데이터만 가져옴
+        usedata['2020'] = pd.to_numeric(usedata['2020'], errors='coerce') #pd.to_numeric()= '2020' 열의 값을 숫자 유형으로 변환
+        usedata.sort_values('2020', inplace=True) #오름차순으로 정렬
+    elif year==2021:#만약 슬라이더가 2021이면
+        usedata=regiondata[['특성별(2)','2021']]   #지역이름과 2021년 데이터만 가져옴
+        usedata['2021'] = pd.to_numeric(usedata['2021'], errors='coerce') #pd.to_numeric()= '2021' 열의 값을 숫자 유형으로 변환
+        usedata.sort_values('2021', inplace=True) #오름차순으로 정렬
+    elif year==2022:#만약 슬라이더가 2022이면
+        usedata=regiondata[['특성별(2)','2022']]#지역이름과 2022년 데이터만 가져옴
+        usedata['2022'] = pd.to_numeric(usedata['2022'], errors='coerce') #pd.to_numeric()= '2022' 열의 값을 숫자 유형으로 변환
+        usedata.sort_values('2022', inplace=True) #오름차순으로 정렬
+    usedataindex=usedata.set_index('특성별(2)')#좌측의 숫자가 적힌 순서index를 지역으로 변경
+
+    if year==2018:#만약 슬라이더가 2018이면
+        dataprice=regiondata[['특성별(2)','2018.1']]#지역이름과 2018년 총 금액 데이터만 가져옴
+        dataprice['2018.1'] = pd.to_numeric(dataprice['2018.1'], errors='coerce') #pd.to_numeric()= '2018.1' 열의 값을 숫자 유형으로 변환
+        dataprice.sort_values('2018.1', inplace=True) #오름차순으로 정렬
+    elif year==2019:#만약 슬라이더가 2019이면
+        dataprice=regiondata[['특성별(2)','2019.1']]#지역이름과 2019년 총 금액 데이터만 가져옴
+        dataprice['2019.1'] = pd.to_numeric(dataprice['2019.1'], errors='coerce') #pd.to_numeric()= '2019.1' 열의 값을 숫자 유형으로 변환
+        dataprice.sort_values('2019.1', inplace=True) #오름차순으로 정렬
+    elif year==2020:#만약 슬라이더가 2020이면
+        dataprice=regiondata[['특성별(2)','2020.1']]#지역이름과 2020년 총 금액 데이터만 가져옴
+        dataprice['2020.1'] = pd.to_numeric(dataprice['2020.1'], errors='coerce') #pd.to_numeric()= '2020.1' 열의 값을 숫자 유형으로 변환
+        dataprice.sort_values('2020.1', inplace=True) #오름차순으로 정렬
+    elif year==2021:#만약 슬라이더가 2021이면
+        dataprice=regiondata[['특성별(2)','2021.1']]   #지역이름과 2021년 총 금액 데이터만 가져옴
+        dataprice['2021.1'] = pd.to_numeric(dataprice['2021.1'], errors='coerce') #pd.to_numeric()= '2021.1' 열의 값을 숫자 유형으로 변환
+        dataprice.sort_values('2021.1', inplace=True) #오름차순으로 정렬
+    elif year==2022:#만약 슬라이더가 2022이면
+        dataprice=regiondata[['특성별(2)','2022.1']]#지역이름과 2022년 총 금액 데이터만 가져옴
+        dataprice['2022.1'] = pd.to_numeric(dataprice['2022.1'], errors='coerce') #pd.to_numeric()= '2022.1' 열의 값을 숫자 유형으로 변환
+        dataprice.sort_values('2022.1', inplace=True) #오름차순으로 정렬
+    datapriceindex=dataprice.set_index('특성별(2)')#좌측의 숫자가 적힌 순서index를 지역으로 변경
+
+    st.write('지역에 따른 배달앱 이용 여부 년도별 변화 (%)')
+    col1, col2 = st.columns([1, 3]) #좌측에 데이터 우측에 그래프 배치1:3비율로 
+    with col1:#좌측
+        st.write(usedataindex)#배달앱 이용자 백분율 데이터 배치 
+    with col2:#우측
+        df = pd.DataFrame(usedataindex)#pandas data frame으로 배달앱 이용자 백분율 데이터 변경
+        st.line_chart(df) #라인차트 작성
+    st.write('지역에 따른 배달앱 월 평균 비용 년도별 변화 (￦)')
+    col1, col2 = st.columns([1, 3])#1:3비율로 좌측에 데이터 우측에 그래프 배치
+    with col1:  #좌측
+            st.write(datapriceindex)#배달앱 이용자별 한달 평균 이용 금액 데이터 배치
+    with col2:      #우측
+        df1 = pd.DataFrame(datapriceindex)#pandas data frame으로 배달앱 이용자별 한달 평균 이용 금액 데이터 변경
+        st.line_chart(df1)#라인차트 작성
+        
+        
+if(add_selectbox == "업종별 배달 차트"):#사이드바에서 업종별 배달 차트 선택 시
+    st.write("# :bar_chart: Let's see the stats#2")
+    st.subheader('업종에 따른 년도별 배달 변화 추이')#업종에 따른 배달 이용률 변화 추이
+    year = st.slider(':spiral_calendar_pad:년도를 선택하세요.', 2018, 2022,2021)#슬라이더로 년도 선택 
+    st.write(year,"년으로 보여드릴게요!")#선택한 년도 알려줌
+
+    data = pd.read_csv('delivery.csv',encoding='cp949') #delivery차트 파일을 읽어옴(출처:https://kosis.kr/statHtml/statHtml.do?orgId=114&tblId=DT_114054_016)
+    Sectorsdata=data[data['특성별(1)']=='업종별'] #업종별로 된 데이터만 가져옴
+    if year==2018:#만약 슬라이더가 2018이면
+        Sydata=Sectorsdata[['특성별(3)','2018']] #업종과 2018년 데이터만 가져옴
+        Sydata['2018'] = pd.to_numeric(Sydata['2018'], errors='coerce') #pd.to_numeric()= '2018' 열의 값을 숫자 유형으로 변환
+        Sydata.sort_values('2018', inplace=True) #오름차순으로 정렬
+    elif year==2019:#만약 슬라이더가 2019이면
+        Sydata=Sectorsdata[['특성별(3)','2019']]#업종과 2019년 데이터만 가져옴
+        Sydata['2019'] = pd.to_numeric(Sydata['2019'], errors='coerce') #pd.to_numeric()= '2019' 열의 값을 숫자 유형으로 변환
+        Sydata.sort_values('2019', inplace=True) #오름차순으로 정렬
+    elif year==2020:#만약 슬라이더가 2020이면
+        Sydata=Sectorsdata[['특성별(3)','2020']]#업종과 2020년 데이터만 가져옴
+        Sydata['2020'] = pd.to_numeric(Sydata['2020'], errors='coerce') #pd.to_numeric()= '2020' 열의 값을 숫자 유형으로 변환
+        Sydata.sort_values('2020', inplace=True) #오름차순으로 정렬
+    elif year==2021:#만약 슬라이더가 2021이면
+        Sydata=Sectorsdata[['특성별(3)','2021']]   #업종과 2021년 데이터만 가져옴
+        Sydata['2021'] = pd.to_numeric(Sydata['2021'], errors='coerce') #pd.to_numeric()= '2021' 열의 값을 숫자 유형으로 변환
+        Sydata.sort_values('2021', inplace=True) #오름차순으로 정렬
+    elif year==2022:#만약 슬라이더가 2022이면
+        Sydata=Sectorsdata[['특성별(3)','2022']]#업종과 2022년 데이터만 가져옴
+        Sydata['2022'] = pd.to_numeric(Sydata['2022'], errors='coerce') #pd.to_numeric()= '2022' 열의 값을 숫자 유형으로 변환
+        Sydata.sort_values('2022', inplace=True) #오름차순으로 정렬
+    Sydataindex=Sydata.set_index('특성별(3)')#좌측의 숫자가 적힌 순서index를 지역으로 변경
     
-    data1=data[data['특성별(1)']=='지역별']
-    st.write(data1)
-    data2=data1[['특성별(2)','2018']]
-    st.write(data2)
-    chart=pd.DataFrame(data2['특성별(2)'], index= ['서울권','수도권','충청권','호남권','경남권','경북권'])
+    st.write('업종에 따른 배달앱 이용 여부 년도별 변화 (%)')
+    col1, col2 = st.columns([2, 5]) #좌측에 데이터 우측에 그래프 배치1:3비율로 
+    with col1:#좌측
+        st.write(Sydataindex)#배달앱 이용자 백분율 데이터 배치 
+    with col2:#우측
+        Sydf = pd.DataFrame(Sydataindex)#pandas data frame으로 배달앱 이용자 백분율 데이터 변경
+        st.line_chart(Sydf) #라인차트 작성
 
-    st.line_chart(chart)
+    
 
-    st.write(data)
-    chart_data = pd.DataFrame(
-        data,index=[range(0,700000,5)], columns=['한식'])
+
+    
